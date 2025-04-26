@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Pollution Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for better look and feel */
+        body {
+            font-family: 'Inter', sans-serif; /* Using Inter font */
+        }
+        /* Style for correct answer button */
+        .correct {
+            background-color: #22c55e !important; /* Tailwind green-500 */
+            color: white !important;
+            border-color: #16a34a !important; /* Tailwind green-600 */
+        }
+        /* Style for incorrect answer button */
+        .incorrect {
+            background-color: #ef4444 !important; /* Tailwind red-500 */
+            color: white !important;
+            border-color: #dc2626 !important; /* Tailwind red-600 */
+        }
+        /* Style for the correct answer when an incorrect option was chosen */
+        .show-correct {
+             background-color: #d1fae5 !important; /* Lighter green */
+             color: #065f46 !important; /* Darker green text */
+             border: 2px solid #10b981 !important; /* Green border */
+        }
+        /* Basic button styling */
+        .option-btn {
+            transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.1s ease;
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+         .option-btn:active:not(:disabled) {
+            transform: translateY(0);
+         }
+        .option-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        /* Next button styling */
+        #next-btn {
+             transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+         #next-btn:hover {
+             background-color: #059669; /* Darker green on hover */
+             transform: translateY(-1px);
+         }
+          #next-btn:active {
+             transform: translateY(0);
+         }
+    </style>
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-sky-100 to-indigo-200 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white rounded-xl shadow-2xl p-6 md:p-10 w-full max-w-2xl">
+        <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-6">Air Pollution Quiz</h1>
+
+        <div id="quiz-container">
+            <div class="flex justify-between items-center mb-4 text-gray-600">
+                <span id="question-number" class="text-sm font-medium">Question 1 of 120</span>
+                <span id="score" class="text-sm font-medium">Score: 0</span>
+            </div>
+
+            <div id="question-container" class="mb-6">
+                <p id="question-text" class="text-lg md:text-xl text-gray-900 font-medium"></p>
+            </div>
+
+            <div id="options-container" class="grid grid-cols-1 gap-3 mb-6">
+                </div>
+
+             <div id="feedback" class="text-center font-medium h-6 mb-4"></div>
+
+
+            <div class="text-center">
+                <button id="next-btn" class="bg-emerald-500 text-white font-semibold py-2 px-6 rounded-lg shadow hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-opacity-75 hidden">
+                    Next Question
+                </button>
+            </div>
+        </div>
+
+        <div id="results-container" class="text-center hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Quiz Complete!</h2>
+            <p id="final-score" class="text-xl text-gray-700 mb-6">Your final score is 0 out of 120.</p>
+            <button id="restart-btn" class="bg-indigo-500 text-white font-semibold py-2 px-6 rounded-lg shadow hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-75">
+                Restart Quiz
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- Quiz Data ---
+        // IMPORTANT: Correct answers were not provided in the PDF.
+        // The 'correctAnswer' field has been set to the FIRST option ('a') for ALL questions.
+        // PLEASE UPDATE the 'correctAnswer' field for each question below with the actual correct answer text.
+        const questions = [
+            // --- Week 1 ---
+            {
+                question: "Match List-I (Air pollution events/accidents) with List-II (Year): A. Donora, Pennsylvania (1948), B. Los Angeles smog (1954), C. Bhopal Gas Tragedy (1984), D. Vapour Cloud Explosion (2009). Select the correct code:",
+                options: ["A-2, B-3, C-1, D-4", "A-4, B-1, C-3, D-2", "A-4, B-3, C-2, D-4", "A-1, B-2, C-3, D-1"],
+                correctAnswer: "A-2, B-3, C-1, D-4" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which of the following fuels was banned by King Edward-I of England in 1307?",
+                options: ["Wood", "Coal", "Both coal and wood", "Fossil fuel"],
+                correctAnswer: "Coal" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "The lithosphere includes: 1. Crust 2. Uppermost mantle 3. Water over the earth 4. Water beneath the earth. Select the correct combination:",
+                options: ["1, 2, 3", "2, 3", "1, 2", "1, 4"],
+                correctAnswer: "1, 2" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "How can chemical transformation affect air pollutants?",
+                options: ["By neutralizing them", "By forming secondary pollutants", "By making them harmless", "By increasing their density"],
+                correctAnswer: "By forming secondary pollutants" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What are Polycyclic Aromatic Hydrocarbons (PAHs) primarily found in?",
+                options: ["Water and air", "Coal and tar sediments", "Vegetation", "Natural gas"],
+                correctAnswer: "Coal and tar sediments" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Forest fires contribute to the presence of Polycyclic Aromatic Hydrocarbons (PAHs) in the environment because they involve:",
+                options: ["Incomplete combustion of organic matter", "Complete combustion of trees", "Chemical reactions in the soil", "Evaporation of water vapor"],
+                correctAnswer: "Incomplete combustion of organic matter" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which of the following is the short-term effects of dioxin on humans?",
+                options: ["vomiting", "coughing", "dark spots and lesions on the skin", "throat irritation"],
+                correctAnswer: "dark spots and lesions on the skin" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which of the following pollutants is NOT mentioned as causing organ toxicity in animals?",
+                options: ["Carbon monoxide (CO)", "Nitrous oxide (N2O)", "Ammonia (NH3)", "Mercury"],
+                correctAnswer: "Nitrous oxide (N2O)" // <<< VERIFY/UPDATE THIS ANSWER (Assuming N2O is less directly toxic than others listed)
+            },
+            {
+                question: "What is a major stressor to biodiversity caused by air pollution?",
+                options: ["Excess deposition of airborne nitrogen in the form of ammonia", "Carbon dioxide emissions", "Ozone layer depletion", "Acid rain"],
+                correctAnswer: "Excess deposition of airborne nitrogen in the form of ammonia" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "As a preservative coating on the building surface, materials used like acrylic copolymers and siloxanes because of their _____ film forming properties.",
+                options: ["Good cohesion", "Good adhesion", "Weak cohesion", "Weak adhesion"],
+                correctAnswer: "Good adhesion" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            // --- Week 2 ---
+            {
+                question: "Why is albedo a significant concern in climatology?",
+                options: ["It influences global wind patterns", "It directly increases greenhouse gas emissions", "It reduces atmospheric oxygen levels", "A decrease in albedo increases heat absorption, causing ice to melt"],
+                correctAnswer: "A decrease in albedo increases heat absorption, causing ice to melt" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What happens when soot enters the atmosphere?",
+                options: ["It reflects sunlight, cooling the air", "It absorbs sunlight and generates heat, warming the air", "It mixes with clouds to form rain", "It increases the albedo of the Earth's surface"],
+                correctAnswer: "It absorbs sunlight and generates heat, warming the air" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "How does soot affect snow and ice after being deposited?",
+                options: ["It reduces their albedo, absorbing more sunlight", "It increases their albedo, reflecting more sunlight", "It has no significant impact on snow and ice", "It accelerates the formation of glaciers"],
+                correctAnswer: "It reduces their albedo, absorbing more sunlight" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "In water bodies, which gas can be depleted by eutrophication?",
+                options: ["CO2", "SO2", "O2", "CO"],
+                correctAnswer: "O2" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which of the following is NOT a type of marine aerosol?",
+                options: ["Sea salt", "Sulfate aerosol", "Mineral dust", "Methane gas"],
+                correctAnswer: "Methane gas" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What is the approximate size of jet drops compared to their precursor bubble diameter?",
+                options: ["50%", "25%", "10%", "5%"],
+                correctAnswer: "10%" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Select the incorrect pair of given particulate matter type and particle size.",
+                options: ["Dust: 1 to 200 µm", "Smoke: 0.01 to 1 µm", "Fumes: 0.1 to 1 µm", "Mist: greater than 1 µm"],
+                correctAnswer: "Fumes: 0.1 to 1 µm" // <<< VERIFY/UPDATE THIS ANSWER (Fumes are typically smaller, < 1 µm, often < 0.1 µm)
+            },
+            {
+                question: "_____ is one of the processes of movement of gases and liquids (fluids) to transfer heat between regions of different temperatures.",
+                options: ["Advection", "Convection", "Diffusion", "Dispersion"],
+                correctAnswer: "Convection" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What is the primary role of the hydroxyl radical (OH) in the troposphere?",
+                options: ["Control the atmospheric lifetime of gases", "Absorb UV radiation", "Cause acid rain", "Act as a greenhouse gas"],
+                correctAnswer: "Control the atmospheric lifetime of gases" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which of the following phenomena is responsible for transferring the heat energy from the tropics to the poles to create atmospheric circulation?",
+                options: ["Conduction", "Convection", "Advection", "Pyrolysis"],
+                correctAnswer: "Advection" // <<< VERIFY/UPDATE THIS ANSWER (Large scale horizontal movement)
+            },
+            // --- Week 3 ---
+             {
+                question: "Which of the following factors is NOT associated with the plume properties? A. Exit velocity, B. Turbulence, C. Atmospheric Stability, D. Wind Speed",
+                options: ["A, & B", "A, C, D", "B, C, D", "None - All are associated"], // Modified option d for clarity
+                correctAnswer: "None - All are associated" // <<< VERIFY/UPDATE THIS ANSWER (All listed factors influence plume properties)
+            },
+            {
+                question: "Which of the following plume types exists under the neutral lapse rate when wind speed is greater than 32 km per hour?",
+                options: ["Looping", "Fanning", "Coning", "Lofting"],
+                correctAnswer: "Coning" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "During which time is the height of the Mixed Layer typically the highest?",
+                options: ["Early morning in winter", "Late afternoon in summer", "Late evening in spring", "Midnight during fall"],
+                correctAnswer: "Late afternoon in summer" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What causes turbulence in the Mixed Layer?",
+                options: ["Gravitational waves", "Decreasing atmospheric pressure", "Ozone formation in the stratosphere", "Solar heating and strong winds"],
+                correctAnswer: "Solar heating and strong winds" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which of the following is a component of the Atmospheric Boundary Layer?",
+                options: ["Tropospheric layer", "Stratospheric layer", "Stable boundary layer", "Thermospheric layer"],
+                correctAnswer: "Stable boundary layer" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What is one of the primary objectives of (National Air Quality Monitoring Programme) NAMP?",
+                options: ["Determining status and trends of ambient air quality", "Monitoring biodiversity loss", "Measuring groundwater quality", "Studying agricultural productivity"],
+                correctAnswer: "Determining status and trends of ambient air quality" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What meteorological parameters are integrated with air quality monitoring under NAMP?",
+                options: ["Wind speed, wind direction, relative humidity (RH), and temperature", "Ozone levels and atmospheric pressure", "Precipitation and solar radiation", "UV index and cloud cover"],
+                correctAnswer: "Wind speed, wind direction, relative humidity (RH), and temperature" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which of the following is an outcome of eclipsing in air quality indices?",
+                options: ["Pollution levels are accurately reported", "Air quality is overestimated", "Air quality is underestimated", "All pollutants are equally represented"],
+                correctAnswer: "Air quality is underestimated" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "If an air pollution index shows ambiguity, how is pollution represented?",
+                options: ["Accurately and without bias", "Underestimated due to eclipsing", "Overestimated due to minor deviations in a single pollutant", "Not represented at all"],
+                correctAnswer: "Overestimated due to minor deviations in a single pollutant" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which of the following is considered a key component in modeling parameters for air quality?",
+                options: ["Soil composition", "Emission sources", "Traffic patterns only", "Population density"],
+                correctAnswer: "Emission sources" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+             // --- Week 4 ---
+            {
+                question: "Which formula calculates mean wind speed at plume height? (u0=ref speed, z0=ref height, z=plume height, p=exponent)",
+                options: ["u(z)=u0(z0/z)", "u(z)=u0(z0/z)^p", "u(z)=u0(z/z0)", "u(z)=u0(z/z0)^p"],
+                correctAnswer: "u(z)=u0(z/z0)^p" // <<< VERIFY/UPDATE THIS ANSWER (Wind Profile Power Law)
+            },
+            {
+                question: "How does the wind angle direction with respect to the receptor affect the total concentration of air pollutants (Gaussian model)?",
+                options: ["It increases with an increase in wind angle direction.", "It remains constant regardless of wind angle direction.", "It decreases as the wind angle direction increases.", "It is unaffected by the wind angle direction."],
+                correctAnswer: "It decreases as the wind angle direction increases." // <<< VERIFY/UPDATE THIS ANSWER (Assuming angle is deviation from direct downwind)
+            },
+            {
+                question: "In the Gaussian dispersion model for a line source: C = (2q / (sqrt(2*pi)*sigma_z*u*sin(phi))) * exp(-H^2 / (2*sigma_z^2)), what is the standard unit of sigma_z?",
+                options: ["meter/second (m/s)", "gram/second (g/s)", "meters (m)", "micrograms/cubic meters (µg/m³)"],
+                correctAnswer: "meters (m)" // <<< VERIFY/UPDATE THIS ANSWER (Standard deviation of plume spread is in length units)
+            },
+            {
+                question: "The initial spread (sigma_y0) for the interpretation of the area source is given as (S=side length):",
+                options: ["sigma_y0 = S/1.2", "sigma_y0 = S/2.2", "sigma_y0 = S/3.2", "sigma_y0 = S/4.2"],
+                correctAnswer: "sigma_y0 = S/4.2" // <<< VERIFY/UPDATE THIS ANSWER (Common approximation, e.g., S/4.3)
+            },
+            {
+                question: "Highway emission rate 0.05 g/s per vehicle, 0.18 vehicles/m. Concentration 600m downwind? Wind 5 m/s perpendicular, overcast. (Requires calculation/lookup)",
+                options: ["1.44 µg/m³", "14.44 µg/m³", "2.88 µg/m³", "28.8 µg/m³"],
+                correctAnswer: "14.44 µg/m³" // <<< VERIFY/UPDATE THIS ANSWER (Needs Gaussian line source calculation with appropriate sigma_z for overcast)
+            },
+            {
+                question: "What does 'assimilative capacity' of air environment refer to?",
+                options: ["Amount of pollution dischargeable without violating water standards", "Maximum pollution dischargeable without violating air quality standards", "Ability of air to remain stagnant", "Rate of pollutant production"],
+                correctAnswer: "Maximum pollution dischargeable without violating air quality standards" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What does a higher ventilation coefficient indicate?",
+                options: ["Poor air quality due to stagnation", "Inefficient dispersal of pollutants", "Efficient atmospheric dispersion and better air quality", "Increased levels of hazardous pollution"],
+                correctAnswer: "Efficient atmospheric dispersion and better air quality" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "The height of the layer in which air pollutants are vertically dispersed due to turbulence and convection is called:",
+                options: ["Mixing height", "Effective height", "Plume rise", "Ventilation coefficient"],
+                correctAnswer: "Mixing height" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "How is the emission factor (EF) expressed?",
+                options: ["Ratio of pollutants to air quality index", "Mass of pollutants divided by activity rate (e.g., volume/weight of material)", "Proportion of emission to meteorological variations", "Concentration of pollutants in the mixing layer"],
+                correctAnswer: "Mass of pollutants divided by activity rate (e.g., volume/weight of material)" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What does a gridded emission inventory provide?",
+                options: ["Information on global wind patterns", "Locational information of emissions of air pollutants and their sources", "Data on rainfall and its effect on pollution", "The chemical composition of pollutants in the atmosphere"],
+                correctAnswer: "Locational information of emissions of air pollutants and their sources" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+             // --- Week 5 ---
+            {
+                question: "Which limitation is NOT associated with the EMPA model for vehicular emissions? (i) Needs catalyst model (ii) Only Light Duty Vehicle (iii) Lacks engine dynamics",
+                options: ["(i), (iii)", "(ii)", "(iii)", "(i), (ii) & (iii)"],
+                correctAnswer: "(iii)" // <<< VERIFY/UPDATE THIS ANSWER (Assuming lack of dynamics IS a limitation)
+            },
+            {
+                question: "Which air pollutant is NOT considered in the VAPI (Vehicular Air Pollution Inventory) model?",
+                options: ["CO", "CO2", "PM", "O3"],
+                correctAnswer: "O3" // <<< VERIFY/UPDATE THIS ANSWER (Ozone is secondary)
+            },
+            {
+                question: "What is the primary purpose of the MARKAL (MARKet Allocation) model?",
+                options: ["Assess economic growth", "Model energy systems and climate compliance", "Monitor air quality", "Optimize agricultural productivity"],
+                correctAnswer: "Model energy systems and climate compliance" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What is the primary focus of the GAINS model?",
+                options: ["Manage energy trade", "Estimate costs/potentials for air pollution/GHG mitigation", "Monitor local air quality via satellite", "Predict rainfall changes"],
+                correctAnswer: "Estimate costs/potentials for air pollution/GHG mitigation" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which pollutant is primarily emitted from livestock enteric fermentation and rice cultivation?",
+                options: ["Methane (CH4)", "Nitrous oxide (N2O)", "Ammonia (NH3)", "Fine particulate matter (PM2.5)"],
+                correctAnswer: "Methane (CH4)" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What source contributes to the release of volatile organic compounds (VOCs) in agriculture?",
+                options: ["Metabolic processes of vegetation/livestock", "Fertilization of soils", "Diesel engines in machinery", "Both a) and c)"],
+                correctAnswer: "Both a) and c)" // <<< VERIFY/UPDATE THIS ANSWER (Vegetation/livestock AND machinery emit VOCs)
+            },
+            {
+                question: "What activities are covered under the residential sector in relation to fuel combustion?",
+                options: ["Heating, boiler operation, commercial cooking", "Domestic cooking and use of fireplaces", "Captive power generation in offices", "Waste management and recycling"],
+                correctAnswer: "Domestic cooking and use of fireplaces" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which facilities are common in urban areas contributing to commercial sector emissions?",
+                options: ["Hospitals, shopping malls, crematoriums", "Agricultural fields, farmhouses", "Rural community centers, livestock farms", "Schools and public parks"],
+                correctAnswer: "Hospitals, shopping malls, crematoriums" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which component detects CO, CO2, HC in transport emission inventory using remote sensing?",
+                options: ["Twin dispersive ultraviolet (UV) spectrometer", "Non-dispersive infrared (NDIR) component", "Laser interferometer", "Gas chromatography"],
+                correctAnswer: "Non-dispersive infrared (NDIR) component" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What is the primary purpose of Aerosol Optical Depth (AOD)?",
+                options: ["Express quantity of light removed by aerosols", "Measure NO2 concentration", "Determine source of gaseous emissions", "Calculate rainwater pH"],
+                correctAnswer: "Express quantity of light removed by aerosols" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+             // --- Week 6 ---
+            {
+                question: "What is EPA’s AP-42 (2000) used for in emission calculations?",
+                options: ["Modeling wind speed", "Measuring gaseous pollutant concentration", "Providing emission factors for pollutants", "Determining fuel thermal efficiency"],
+                correctAnswer: "Providing emission factors for pollutants" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Where is a kerb site location typically found?",
+                options: ["Near a water body", "Alongside a pavement", "On the outskirts of a city", "Far from any pavement"],
+                correctAnswer: "Alongside a pavement" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What is the primary goal of the bottom-up or source-based method?",
+                options: ["Ignore emissions sources", "Avoid documenting secondary aerosol potential", "Locate pollution sources and develop emission inventories", "Avoid chemical transport modeling"],
+                correctAnswer: "Locate pollution sources and develop emission inventories" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "In the mass balance equation (receptor modeling), what does Cij represent?",
+                options: ["Concentration of jth species in ith sample", "Source profile for kth source", "Emission factor of a pollutant", "Meteorological factor influencing dispersion"],
+                correctAnswer: "Concentration of jth species in ith sample" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which pollutants are receptor models mainly used to analyze?",
+                options: ["Ozone (O3)", "Carbon dioxide (CO2)", "Particulate matter (PM)", "Nitric oxide (NO)"],
+                correctAnswer: "Particulate matter (PM)" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What visual test is commonly used to assess the normality of data?",
+                options: ["Normal probability plots", "Pie charts", "Line graphs", "Bar charts"],
+                correctAnswer: "Normal probability plots" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which is a common myth about air pollution?",
+                options: ["Air pollution occurs only outdoors", "Air pollution occurs indoors and outdoors equally", "Air pollution is harmless", "Air pollution is caused by poor air quality only"],
+                correctAnswer: "Air pollution occurs only outdoors" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which of the following is NOT a cause of indoor air pollution?",
+                options: ["Air tightness of buildings", "Poorly designed air conditioning systems", "High altitudes", "Indoor sources of pollution"],
+                correctAnswer: "High altitudes" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "How does excess oxygen affect the formation of carbon monoxide (CO)?",
+                options: ["It decreases the formation of CO", "It increases the formation of CO", "It has no effect on CO formation", "It makes CO more visible"],
+                correctAnswer: "It decreases the formation of CO" // <<< VERIFY/UPDATE THIS ANSWER (Promotes complete combustion to CO2)
+            },
+            {
+                question: "Where are levels of lead in soil typically higher?",
+                options: ["Near schools and playgrounds", "Near sources like lead smelters, mines, heavily trafficked roadways", "In urban parks", "Near agricultural fields using organic methods"],
+                correctAnswer: "Near sources like lead smelters, mines, heavily trafficked roadways" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            // --- Week 7 ---
+            {
+                question: "What are the immediate health effects of exposure to indoor air pollutants?",
+                options: ["Respiratory diseases and cancer", "Irritation of eyes, nose, and throat", "Cardiovascular diseases", "Neurological disorders"], // Added 'disorders' to d
+                correctAnswer: "Irritation of eyes, nose, and throat" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Asbestosis, a serious progressive, long-term, non-cancer disease of the lungs is associated with the exposure of:",
+                options: ["Particulate matter", "Second hand smoke", "Asbestos", "Volatile organic compounds (VOCs)"],
+                correctAnswer: "Asbestos" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What is the primary goal of exposure assessment for indoor air pollutants?",
+                options: ["To enhance building aesthetics", "To identify pollutant sources and quantify risks", "To promote the use of natural ventilation", "To calculate construction costs"],
+                correctAnswer: "To identify pollutant sources and quantify risks" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which type of sampling relies on kinetic energy of gas molecules and diffusion onto a sorbent medium?",
+                options: ["Active sampling", "Passive sampling", "Stratified sampling", "Cluster sampling"],
+                correctAnswer: "Passive sampling" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which method is commonly used in Computational Fluid Dynamics (CFD) modelling?",
+                options: ["Finite element method", "Box modelling", "Well-mixed model", "Stratified sampling"],
+                correctAnswer: "Finite element method" // <<< VERIFY/UPDATE THIS ANSWER (Also Finite Volume, Finite Difference)
+            },
+            {
+                question: "Which modelling approach assumes spatially uniform pollutant concentrations indoors?",
+                options: ["Box model", "Well-mixed model", "CFD model", "Advection model"],
+                correctAnswer: "Well-mixed model" // <<< VERIFY/UPDATE THIS ANSWER (Box model is often used synonymously)
+            },
+            {
+                question: "What is the primary advantage of using HEPA filters for air cleaning?",
+                options: ["They remove both gaseous and particulate pollutants.", "They are cost-effective for large spaces.", "They effectively capture fine and ultrafine particles.", "They eliminate microbial contaminants."],
+                correctAnswer: "They effectively capture fine and ultrafine particles." // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which technology is most effective in reducing microbial contamination in indoor air?",
+                options: ["UVGI systems", "Ionizers", "Activated carbon filters", "Cyclone separators"],
+                correctAnswer: "UVGI systems" // <<< VERIFY/UPDATE THIS ANSWER (Ultraviolet Germicidal Irradiation)
+            },
+            {
+                question: "According to case study 'Personal Exposure to Fine Particles', which method measured personal PM2.5 exposure?",
+                options: ["High-volume air sampling", "Palm sized optical sensors", "Passive diffusion tubes", "Infrared imaging"],
+                correctAnswer: "Palm sized optical sensors" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "According to case study 'Personal Exposure to Fine Particles', which activities had the highest exposure to fine particles?",
+                options: ["Traffic and cooking", "Market", "Workplace", "Classroom"],
+                correctAnswer: "Traffic and cooking" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            // --- Week 8 ---
+            {
+                question: "According to case study 'Indoor Air Quality in Nursery Buildings, UAE', what measures were adopted?",
+                options: ["Controlling the source of pollutants", "Improving ventilation", "Removing pollutants via purification", "All the above"],
+                correctAnswer: "All the above" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Controlling the source of pollutants, improving ventilation and removing pollutants via purification are effective IAQ measures.", // Reworded Q2 slightly
+                options: ["True", "False"],
+                correctAnswer: "True" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What is the primary substance responsible for ozone layer depletion?",
+                options: ["Methane (CH4)", "Chlorofluorocarbons (CFCs)", "Carbon Dioxide (CO2)", "Ammonia (NH3)"],
+                correctAnswer: "Chlorofluorocarbons (CFCs)" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which international treaty was established to address ozone depletion?",
+                options: ["Kyoto Protocol", "Paris Agreement", "Montreal Protocol", "Basel Convention"],
+                correctAnswer: "Montreal Protocol" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What is a major cause of global warming?",
+                options: ["Particulate matter emission", "Accumulation of greenhouse gases like CO2 and CH4", "Deforestation in tropical regions", "Loss of biodiversity"],
+                correctAnswer: "Accumulation of greenhouse gases like CO2 and CH4" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which human activity is the largest contributor to methane emissions?",
+                options: ["Industrial manufacturing", "Fossil fuel combustion", "Livestock farming and rice cultivation", "Urban infrastructure development"],
+                correctAnswer: "Livestock farming and rice cultivation" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "GHGs act like a blanket, trapping outgoing longwave radiation and thus declining global atmospheric temperature.",
+                options: ["True", "False"],
+                correctAnswer: "False" // <<< VERIFY/UPDATE THIS ANSWER (They INCREASE temperature)
+            },
+            {
+                question: "Which Sustainable Development Goal (SDG) focuses on action to combat climate change?",
+                options: ["SDG – 6", "SDG – 10", "SDG – 13", "SDG – 16"],
+                correctAnswer: "SDG – 13" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which pollutants are responsible for the formation of acid rain?",
+                options: ["Methane (CH4) and carbon monoxide (CO)", "Sulfur dioxide (SO2) and nitrogen oxides (NOx)", "Volatile organic compounds (VOCs) and ozone (O3)", "Ammonia (NH3) and particulate matter (PM2.5)"],
+                correctAnswer: "Sulfur dioxide (SO2) and nitrogen oxides (NOx)" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What is a significant effect of acid rain on aquatic ecosystems?",
+                options: ["Increased water temperatures", "Lowering pH levels, leading to death of aquatic organisms", "Increased levels of dissolved oxygen", "Decreased biodiversity in terrestrial environments"],
+                correctAnswer: "Lowering pH levels, leading to death of aquatic organisms" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+             // --- Week 9 ---
+            {
+                question: "Which pollutant is most commonly associated with vehicular emissions?",
+                options: ["Lead", "Nitrogen oxides (NOx)", "Ozone", "Radon"],
+                correctAnswer: "Nitrogen oxides (NOx)" // <<< VERIFY/UPDATE THIS ANSWER (Also CO, PM, HC, but NOx is a major focus)
+            },
+            {
+                question: "Which device is fitted in vehicles to control air pollution from tailpipe emissions?",
+                options: ["Electrostatic precipitator", "Catalytic converter", "Bag filter", "Cyclone separator"],
+                correctAnswer: "Catalytic converter" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What is the primary function of cyclone separators in air pollution control?",
+                options: ["Capture gaseous pollutants", "Remove large particulate matter from emissions", "Neutralize sulfur dioxide emissions", "Increase air circulation rates"],
+                correctAnswer: "Remove large particulate matter from emissions" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What is the primary purpose of baghouse filters in industrial settings?",
+                options: ["Remove gaseous pollutants from emissions", "Capture fine particulate matter", "Reduce nitrogen oxides (NOx) levels", "Increase the velocity of exhaust gases"],
+                correctAnswer: "Capture fine particulate matter" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which air pollution control device is best suited for removing fine mist and liquid droplets?",
+                options: ["Cyclone separator", "Wet scrubber", "Ionizer", "Baghouse filter"],
+                correctAnswer: "Wet scrubber" // <<< VERIFY/UPDATE THIS ANSWER (Mist eliminators often part of wet scrubbers)
+            },
+            {
+                question: "Biofiltration uses irreversible processes to control gaseous contaminants.",
+                options: ["True", "False"],
+                correctAnswer: "True" // <<< VERIFY/UPDATE THIS ANSWER (Biological processes convert pollutants)
+            },
+            {
+                question: "The type of force involved in physical adsorption is:",
+                options: ["Chemical interaction", "Van der Waals force", "Centrifugal force", "No force is involved"],
+                correctAnswer: "Van der Waals force" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which technique is adopted when contaminant concentration is high enough for economical recovery?",
+                options: ["Biofiltration", "Oxidation", "Condensation", "Absorption"],
+                correctAnswer: "Condensation" // <<< VERIFY/UPDATE THIS ANSWER (Or potentially Absorption/Adsorption depending on specifics)
+            },
+            {
+                question: "Which technology is used to control odorous emissions from wastewater treatment plants?",
+                options: ["Biofilters", "Cyclones", "Baghouse filters", "Catalytic converters"],
+                correctAnswer: "Biofilters" // <<< VERIFY/UPDATE THIS ANSWER (Commonly used for odors)
+            },
+            {
+                question: "Gasoline fumes evaporating from fuel tank/carburetor are significantly reduced by:",
+                options: ["The air-injection system", "Catalytic converter", "Positive crankcase ventilation valve", "Evaporative control system"],
+                correctAnswer: "Evaporative control system" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+             // --- Week 10 ---
+            {
+                question: "Cyclone: inlet 20cm, N=5, T=350K, v=10m/s, density=1.5g/cm³, viscosity=0.0748 kg/m-h. Cut diameter?",
+                options: ["6.94 µm", "8.33 µm", "12.14 µm", "15.55 µm"],
+                correctAnswer: "6.94 µm" // <<< VERIFY/UPDATE THIS ANSWER (Requires calculation using Lapple's equation or similar)
+            },
+            {
+                question: "Baghouse: V_in=800 m³/min, V_filter=4 m/min. Bag: 20cm W x 3m L. Spacing? Wall? Num bags? (Incomplete info)",
+                options: ["95", "106", "144", "225"],
+                correctAnswer: "106" // <<< VERIFY/UPDATE THIS ANSWER (Requires calculation: Area = V_in / V_filter; Num = Area / Area_per_bag. Needs assumptions on spacing/layout)
+            },
+            {
+                question: "ESP: Area=100 m², Flow=3 m³/s, Eff=99.5%. Migration velocity (w)?",
+                options: ["0.16 m/s", "0.67 m/s", "1.54 m/s", "2.15 m/s"],
+                correctAnswer: "0.16 m/s" // <<< VERIFY/UPDATE THIS ANSWER (Requires Deutsch-Anderson eq: Eff = 1 - exp(-Aw/Q))
+            },
+            {
+                question: "ESP: 2 sections, Plates 5m W x 7m H, 25cm centers, Flow=3 m³/s, w=12 cm/s. Collection efficiency?",
+                options: ["98.55 %", "98.25 %", "99.63 %", "99.25 %"],
+                correctAnswer: "99.63 %" // <<< VERIFY/UPDATE THIS ANSWER (Requires calculating total area A and using Deutsch-Anderson eq)
+            },
+            {
+                question: "Settling Chamber: v_h=1m/s, T=75°C, SG=1.5, L=10m, H=2m. Min particle size for 100% removal?",
+                options: ["65.28 µm", "71.68 µm", "83.55 µm", "90.67 µm"],
+                correctAnswer: "71.68 µm" // <<< VERIFY/UPDATE THIS ANSWER (Requires Stokes' Law: v_t = H*v_h/L; then calculate diameter from v_t)
+            },
+            {
+                question: "Which pollutant is NOT included in the revised National Ambient Air Quality Standard (NAAQS, India 2009)?",
+                options: ["Ozone", "Benzene", "Arsenic", "Cadmium"],
+                correctAnswer: "Cadmium" // <<< VERIFY/UPDATE THIS ANSWER (NAAQS 2009 includes O3, Benzene, Arsenic, Lead, Ni, PM10, PM2.5, NOx, SO2, CO, NH3, BaP)
+            },
+            {
+                question: "What is the annual permissible limit for PM2.5 in ambient air as per WHO guidelines 2021?",
+                options: ["5 µg/m³", "10 µg/m³", "25 µg/m³", "50 µg/m³"],
+                correctAnswer: "5 µg/m³" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What is the primary goal of the National Clean Air Programme (NCAP) in India?",
+                options: ["Eliminate PM emissions by 2025", "Achieve 20–30% reduction in PM2.5/PM10 by 2024 (vs 2017)", "Reduce vehicular emissions in all cities", "Promote urbanization in non-attainment areas"],
+                correctAnswer: "Achieve 20–30% reduction in PM2.5/PM10 by 2024 (vs 2017)" // <<< VERIFY/UPDATE THIS ANSWER (Target year/percentage might be updated)
+            },
+            {
+                question: "What is the focus of the Graded Response Action Plan (GRAP)?",
+                options: ["Managing waste in urban areas", "Reducing air pollution during severe episodes in Delhi NCR", "Expanding public transportation networks", "Implementing electric vehicle subsidies"],
+                correctAnswer: "Reducing air pollution during severe episodes in Delhi NCR" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which Indian policy promotes electric vehicle adoption to reduce emissions?",
+                options: ["National Electric Mobility Mission Plan (NEMMP)", "Make in India Program", "National Renewable Energy Policy", "National Highway Development Project"],
+                correctAnswer: "National Electric Mobility Mission Plan (NEMMP)" // <<< VERIFY/UPDATE THIS ANSWER (Also FAME scheme)
+            },
+             // --- Week 11 ---
+            {
+                question: "In 1991, which protocol related to control of VOC emissions or transboundary fluxes?",
+                options: ["Geneva protocol", "Gothenburg Protocol", "Stockholm Convention", "Helsinki Protocol"],
+                correctAnswer: "Geneva protocol" // <<< VERIFY/UPDATE THIS ANSWER (Specifically the 1991 VOC Protocol under LRTAP)
+            },
+            {
+                question: "What is the primary goal of the Paris Agreement under the UNFCCC?",
+                options: ["Phase out ozone-depleting substances", "Limit global temperature rise well below 2°C", "Monitor/control urban air pollution", "Eliminate GHG emissions by 2030"],
+                correctAnswer: "Limit global temperature rise well below 2°C" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which treaty focuses on reducing ozone-depleting substances?",
+                options: ["Kyoto Protocol", "Gothenburg Protocol", "Montreal Protocol", "Stockholm Convention"],
+                correctAnswer: "Montreal Protocol" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What was an unintended consequence of improved air quality during COVID lockdowns?",
+                options: ["Decrease in ozone levels in some regions", "Increased indoor air pollution", "Reduced visibility in urban areas", "A slight increase in ground-level ozone in certain cities"],
+                correctAnswer: "A slight increase in ground-level ozone in certain cities" // <<< VERIFY/UPDATE THIS ANSWER (Due to complex NOx/VOC chemistry changes)
+            },
+            {
+                question: "To control dust pollution at construction sites, which mitigation measure is most effective?",
+                options: ["Fogging system", "Ban on refuse burning", "Vehicle usage controls", "Bike parking facilities"],
+                correctAnswer: "Fogging system" // <<< VERIFY/UPDATE THIS ANSWER (Directly suppresses dust)
+            },
+            {
+                question: "Which mitigation strategy focuses on reducing emissions via enhanced clean fuel use in rural/urban areas?",
+                options: ["Congestion pricing", "Non-motorised transportation", "Pradhan Mantri Ujjwala Yojana", "Auto Fuel Policy"],
+                correctAnswer: "Pradhan Mantri Ujjwala Yojana" // <<< VERIFY/UPDATE THIS ANSWER (Focuses on LPG access)
+            },
+            {
+                question: "Blending of _______ methanol in gasoline can bring down GHG emissions by 20% (PM, NOx, SOx).",
+                options: ["10%", "15%", "20%", "25%"],
+                correctAnswer: "15%" // <<< VERIFY/UPDATE THIS ANSWER (Refers to M15 blend, actual reduction varies)
+            },
+            {
+                question: "What porous substance obtained from crop stubble via Pyrolysis helps improve soil?",
+                options: ["Composting", "Biochar", "Mechanical processing", "Happy seeder"],
+                correctAnswer: "Biochar" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What is the size range of PM10 particles?",
+                options: ["Greater than 10 microns", "Less than or equal to 10 microns in aerodynamic diameter", "Between 10 and 50 microns", "Exactly 10 microns"], // Clarified option b
+                correctAnswer: "Less than or equal to 10 microns in aerodynamic diameter" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "What is the 24-hour National Ambient Air Quality Standard (NAAQS, India) for PM10 in residential areas (in μg/m³)?",
+                options: ["40", "60", "80", "100"],
+                correctAnswer: "100" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+             // --- Week 12 ---
+            {
+                question: "The filter paper used for sampling PM2.5 is PTFE. PTFE refers to:",
+                options: ["Poly tetra fluoro ethylamine", "Poly tetra fluoro ethyl", "Poly tetra fluoro ethylene", "Poly tetra fluoro ethanol"],
+                correctAnswer: "Poly tetra fluoro ethylene" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "According to NAAQS (India), what is the permissible 24-hour PM2.5 concentration in Ecologically Sensitive Areas (μg/m³)?",
+                options: ["40", "60", "80", "100"],
+                correctAnswer: "60" // <<< VERIFY/UPDATE THIS ANSWER (Same as residential/industrial for 24hr PM2.5)
+            },
+            {
+                question: "The absorbing reagent Potassium Tetrachloro mercurate (TCM) is used in sampling/analysis of:",
+                options: ["SO2", "NO2", "CO", "O3"],
+                correctAnswer: "SO2" // <<< VERIFY/UPDATE THIS ANSWER (West-Gaeke method)
+            },
+            {
+                question: "Modified Jacob & Hochheiser Method is used for sampling/analysis of:",
+                options: ["CO", "O3", "SO2", "NO2"],
+                correctAnswer: "NO2" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "In which sampling type is the velocity/direction of gas entering the nozzle the same as the gas in the duct/stack?",
+                options: ["Isothermal sampling", "Isokinetic sampling", "Adiabatic sampling", "Differential sampling"],
+                correctAnswer: "Isokinetic sampling" // <<< VERIFY/UPDATE THIS ANSWER
+            },
+            {
+                question: "Which method measures SO2 from a gas sample extracted from a stack sampling point?",
+                options: ["Barium thorin titration method", "Improved West and Gaeke method", "Modified Jacob and Hochheiser method", "Gravimetric method"],
+                correctAnswer: "Barium thorin titration method" // <<< VERIFY/UPDATE THIS ANSWER (Common titration method for SO2)
+            },
+            {
+                question: "Which pollutants are typically monitored using multi-gas monitors?",
+                options: ["CO, CO2, VOCs, and ozone", "PM2.5 and PM10", "Heavy metals and ammonia", "Sulfur dioxide and nitrogen dioxide"],
+                correctAnswer: "CO, CO2, VOCs, and ozone" // <<< VERIFY/UPDATE THIS ANSWER (Common set, though specifics vary)
+            },
+            {
+                question: "Which parameter is measured using non-dispersive infrared (NDIR) spectroscopy in a multi-gas monitor?",
+                options: ["Temperature", "Percent Relative Humidity (%RH)", "Carbon Monoxide (CO)", "Carbon Dioxide (CO2)"],
+                correctAnswer: "Carbon Dioxide (CO2)" // <<< VERIFY/UPDATE THIS ANSWER (NDIR is very common for CO2 and CO)
+            },
+            {
+                question: "What principle is commonly used in spectrometers to analyze particulate matter size/concentration?",
+                options: ["Light scattering and laser diffraction", "Mass spectrometry", "Gravimetric analysis", "Infrared absorption"],
+                correctAnswer: "Light scattering and laser diffraction" // <<< VERIFY/UPDATE THIS ANSWER (Optical Particle Counters/Sizers)
+            },
+            {
+                question: "The minimum time interval for monitoring particulate matter using spectrometer software is typically:",
+                options: ["45 seconds", "30 seconds", "12 seconds", "6 seconds"],
+                correctAnswer: "6 seconds" // <<< VERIFY/UPDATE THIS ANSWER (Depends heavily on the specific instrument, but seconds resolution is common)
+            }
+        ];
+
+
+        // --- DOM Elements ---
+        const quizContainer = document.getElementById('quiz-container');
+        const resultsContainer = document.getElementById('results-container');
+        const questionNumberEl = document.getElementById('question-number');
+        const scoreEl = document.getElementById('score');
+        const questionTextEl = document.getElementById('question-text');
+        const optionsContainerEl = document.getElementById('options-container');
+        const feedbackEl = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const finalScoreEl = document.getElementById('final-score');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // --- Quiz State Variables ---
+        let shuffledQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerSelected = false; // Flag to track if an answer has been selected
+
+        // --- Functions ---
+
+        /**
+         * Shuffles an array in place using the Fisher-Yates algorithm.
+         * @param {Array} array - The array to shuffle.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+        }
+
+        /**
+         * Starts or restarts the quiz.
+         */
+        function startQuiz() {
+            // Reset state
+            currentQuestionIndex = 0;
+            score = 0;
+            answerSelected = false;
+            feedbackEl.textContent = '';
+            feedbackEl.className = 'text-center font-medium h-6 mb-4'; // Reset feedback style
+            nextBtn.classList.add('hidden');
+            resultsContainer.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+
+            // Shuffle questions
+            shuffledQuestions = [...questions]; // Create a copy before shuffling
+            shuffleArray(shuffledQuestions);
+
+            // Update UI
+            scoreEl.textContent = `Score: ${score}`;
+            // Display the first question
+            displayQuestion();
+        }
+
+        /**
+         * Displays the current question and its options.
+         */
+        function displayQuestion() {
+             // Reset state for the new question
+            answerSelected = false;
+            feedbackEl.textContent = '';
+            feedbackEl.className = 'text-center font-medium h-6 mb-4'; // Reset feedback style
+            nextBtn.classList.add('hidden'); // Hide next button initially
+
+             // Ensure we don't go beyond the array bounds
+             if (currentQuestionIndex >= shuffledQuestions.length) {
+                 showResults();
+                 return;
+             }
+
+            // Get the current question object
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+
+            // Update question number display - Reflects total number of questions
+            questionNumberEl.textContent = `Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}`;
+
+            // Update question text
+            questionTextEl.textContent = currentQuestion.question;
+
+            // Clear previous options
+            optionsContainerEl.innerHTML = '';
+
+            // Create and append buttons for each option
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                // Apply Tailwind classes for styling
+                button.className = 'option-btn w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-50 text-left';
+                // Add event listener to handle option selection
+                // Ensure currentQuestion.correctAnswer is defined before adding listener
+                 if (currentQuestion.correctAnswer !== undefined) {
+                    button.addEventListener('click', () => selectAnswer(button, option, currentQuestion.correctAnswer));
+                 } else {
+                     console.error("Correct answer is undefined for question:", currentQuestion.question);
+                     // Optionally disable the button or handle the error differently
+                     button.disabled = true;
+                 }
+                optionsContainerEl.appendChild(button);
+            });
+        }
+
+        /**
+         * Handles the selection of an answer option.
+         * @param {HTMLButtonElement} selectedButton - The button element that was clicked.
+         * @param {string} selectedOption - The text content of the selected option.
+         * @param {string} correctAnswer - The correct answer for the current question.
+         */
+        function selectAnswer(selectedButton, selectedOption, correctAnswer) {
+             // Prevent selecting another answer for the same question
+            if (answerSelected) return;
+            answerSelected = true;
+
+            // Disable all option buttons after selection
+            const optionButtons = optionsContainerEl.querySelectorAll('.option-btn');
+            optionButtons.forEach(btn => btn.disabled = true);
+
+             // Ensure correctAnswer is a string for comparison
+            const correctAnswerStr = String(correctAnswer);
+            const selectedOptionStr = String(selectedOption);
+
+
+            // Check if the selected answer is correct
+            if (selectedOptionStr === correctAnswerStr) {
+                score++; // Increment score
+                scoreEl.textContent = `Score: ${score}`; // Update score display
+                selectedButton.classList.add('correct'); // Add correct style
+                feedbackEl.textContent = 'Correct!';
+                feedbackEl.classList.add('text-green-600');
+            } else {
+                selectedButton.classList.add('incorrect'); // Add incorrect style
+                feedbackEl.textContent = `Wrong! Correct: ${correctAnswerStr}`; // Show correct answer text
+                feedbackEl.classList.add('text-red-600');
+
+                // Highlight the correct answer
+                optionButtons.forEach(btn => {
+                    if (String(btn.textContent) === correctAnswerStr) {
+                        btn.classList.add('show-correct'); // Add style to show the correct one
+                    }
+                });
+            }
+
+            // Show the "Next Question" button
+            nextBtn.classList.remove('hidden');
+        }
+
+        /**
+         * Moves to the next question or shows the final results.
+         */
+        function handleNextQuestion() {
+            currentQuestionIndex++; // Move to the next question index
+
+            // Check if there are more questions
+            if (currentQuestionIndex < shuffledQuestions.length) {
+                displayQuestion(); // Display the next question
+            } else {
+                showResults(); // Show final results if quiz is over
+            }
+        }
+
+        /**
+         * Displays the final quiz results.
+         */
+        function showResults() {
+            quizContainer.classList.add('hidden'); // Hide the quiz area
+            resultsContainer.classList.remove('hidden'); // Show the results area
+            // Display the final score - Reflects total number of questions
+            finalScoreEl.textContent = `Your final score is ${score} out of ${shuffledQuestions.length}.`;
+        }
+
+        // --- Event Listeners ---
+        nextBtn.addEventListener('click', handleNextQuestion);
+        restartBtn.addEventListener('click', startQuiz);
+
+        // --- Initial Quiz Start ---
+        document.addEventListener('DOMContentLoaded', startQuiz); // Start the quiz when the page loads
+
+    </script>
+
+</body>
+</html>
