@@ -16,6 +16,7 @@ This is a lightweight and interactive application designed to test your knowledg
 
 ---
 
+![image](https://github.com/user-attachments/assets/fe5b36fa-dea8-43e7-a593-ed7c04a66e0d)
 
 
 ## Installation
