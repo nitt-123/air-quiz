@@ -1,6 +1,3 @@
-Of course! Here’s a clean, professional, and friendly `README.md` you can use for your **Quiz App**:
-
----
 
 # Quiz App
 
