@@ -16,11 +16,7 @@ This is a lightweight and interactive application designed to test your knowledg
 
 ---
 
-## Demo
 
-> [Include a link to a live demo if available, or a screenshot/GIF showcasing the app.]
-
----
 
 ## Installation
 
@@ -76,7 +72,7 @@ This project is licensed under the [MIT License](LICENSE).
 ## Acknowledgements
 
 - Thanks to everyone who inspired this project.
-- [Optional] Quiz questions sourced from [API/Database/Credits].
+Nptel Assignment Problems!!
 
 ---
 
